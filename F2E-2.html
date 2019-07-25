@@ -1,0 +1,181 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css">
+  <link rel="stylesheet" href="F2E-2.css">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">
+    <div class="loadingPage" :class="{loadingOpen: loadingOpen}">
+      <div class="container aic">
+        <div class="left">
+          <div class="top-card">
+              <div class="card z-index-6 lg-card event-none" :style="{'backgroundColor': cards[1].type}" >
+                  <div class="imgbox">
+                    <img :src='cards[1].src' alt="">
+                  </div>
+                  <div class="mark-top" :class="cards[1].mark"></div>
+                  <div class="mark-bottom" :class="cards[1].mark"></div>
+                  <div class="number-top"><img :src="cards[1].numsvg" alt=""></div>
+                  <div class="number-bottom"><img :src="cards[1].numsvg" alt=""></div>
+                </div>
+          </div>
+
+          <div class="middle-content">
+            <div class="title">FREECELL</div>
+            <span class="title-content">THE F2E WEEK2</span>
+          </div>
+
+          <div class="bottom-card-group">
+              <div class="card z-index-6 top-0 mx-5 sm-card event-none" :style="{'backgroundColor': cards[2].type}" >
+                  <div class="imgbox">
+                    <img :src='cards[2].src' alt="">
+                  </div>
+                  <div class="mark-top" :class="cards[2].mark"></div>
+                  <div class="mark-bottom" :class="cards[2].mark"></div>
+                  <div class="number-top"><img :src="cards[2].numsvg" alt=""></div>
+                  <div class="number-bottom"><img :src="cards[2].numsvg" alt=""></div>
+                </div>
+                <div class="card z-index-6 top-0 mx-5 sm-card event-none" :style="{'backgroundColor': cards[3].type}" >
+                    <div class="imgbox">
+                      <img :src='cards[3].src' alt="">
+                    </div>
+                    <div class="mark-top" :class="cards[3].mark"></div>
+                    <div class="mark-bottom" :class="cards[3].mark"></div>
+                    <div class="number-top"><img :src="cards[3].numsvg" alt=""></div>
+                    <div class="number-bottom"><img :src="cards[3].numsvg" alt=""></div>
+                  </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="right-inside">
+            <div class="card z-index-6 top-0 event-none" v-for="card in loadcards" :style="{'backgroundColor': card.type}" >
+                <div class="imgbox">
+                  <img :src='card.src' alt="">
+                </div>
+                <div class="mark-top" :class="card.mark"></div>
+                <div class="mark-bottom" :class="card.mark"></div>
+                <div class="number-top"><img :src="card.numsvg" alt=""></div>
+                <div class="number-bottom"><img :src="card.numsvg" alt=""></div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fixContainer z-index-7" :class="{hintOpen: hintOpen}">
+      <div class="fix-box">
+        <div class="fix-box-inside">
+          <img class="birdCry" src="F2E-2-picture/crybird.png" alt="">
+          <div class="tip">NO MORE MOVES</div>
+          <p class="tip-content">There are no moves available</p>
+          <div class="fix-btn-group">
+            <div class="btn new-game btn-sm margin-0" @click="playNewGame">NEW GAME</div>
+            <div class="btn restart btn-sm" @click="restartGame">RESTRT</div>
+            <div class="btn undo btn-sm margin-0" @click="undo">UNDO</div>
+          </div>
+          <div class="cancel" @click="hintOpen=!hintOpen">
+            <span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="container">
+        <div class="bottom-btn-group">
+            <div class="btn hint z-index-5" @click="loadingOpen=!loadingOpen">OPENFRONT</div>
+          <div class="btn undo z-index-5" @click="undo">UNDO</div>
+          <div class="btn hint z-index-5" @click="hintOpen=!hintOpen">HINT</div>
+        </div>
+        <div class="right-main">
+          <div class="btn new-game z-index-5" @click="playNewGame">NEW GAME</div>
+          <div class="card-all">
+            <!-- left card box start -->
+            <div class="cardBox-left">
+              <div class="cardBox-left-item" v-for="blankBox in blankBoxes" @drop="dropToBlankBoxes(blankBox)" @dragover="stopDrop">
+                  <div class="card z-index-6" draggable="true" v-for="card in blankBox" :style="{'backgroundColor': card.type}" @dragstart='dragFormBoxes(card, blankBox)'>
+                      <div class="imgbox">
+                        <img :src='card.src' alt="">
+                      </div>
+                      <div class="mark-top" :class="card.mark"></div>
+                      <div class="mark-bottom" :class="card.mark"></div>
+                      <div class="number-top"><img :src="card.numsvg" alt=""></div>
+                      <div class="number-bottom"><img :src="card.numsvg" alt=""></div>
+                    </div>
+              </div>
+            </div>
+            <!-- left card box end -->
+
+
+            <!-- middle time box start -->
+            <div class="freeCell-time">
+              <div class="move">MOVE： {{ moves }}</div>
+              <div class="score">SCORE： {{ score }}</div>
+              <span>FreeCell</span>
+              <div class="time">{{ minute }} : {{ second }}</div>
+            </div>
+            <!-- middle time box end -->
+
+
+            <!-- right card box start -->
+            <div class="cardBox-right">
+              <div class="cardBox-right-item" draggable="true" v-for="standardBox in standardBoxes" @drop="dropToStandardBoxes(standardBox)" @dragover="stopDrop">
+                  <div class="card z-index-6" v-for="card in standardBox" :style="{'backgroundColor': card.type}" draggable="true">
+                      <div class="imgbox">
+                        <img :src='card.src' alt="">
+                      </div>
+                      <div class="mark-top" :class="card.mark"></div>
+                      <div class="mark-bottom" :class="card.mark"></div>
+                      <div class="number-top"><img :src="card.numsvg" alt=""></div>
+                      <div class="number-bottom"><img :src="card.numsvg" alt=""></div>
+                    </div>
+                <div class="icon-clover icon-set z-index-1"></div>
+              </div>
+              <!-- <div class="cardBox-right-item">
+                <div class="icon-heart icon-set"></div>
+              </div>
+              <div class="cardBox-right-item">
+                <div class="icon-diamond icon-set"></div>
+              </div>
+              <div class="cardBox-right-item">
+                <div class="icon-spade icon-set"></div>
+              </div> -->
+            </div>
+            <!-- right card box end -->
+          </div>
+
+
+          <!-- card array start -->
+          <div class="cardList">
+            <div class="cardList-item" v-for="(cardBox,key) in cardBoxes" @drop="dropToCardBoxes(cardBox)" @dragover="stopDrop">
+              <div class="cardBox">
+                <div class="card z-index-6" v-for="(card,key) in cardBox" draggable="true" :style="{'backgroundColor': card.type}" @dragstart="dragFormBoxes(card, cardBox)">
+                <div class="imgbox">
+                  <img :src='card.src' alt="">
+                </div>
+                <div class="mark-top" :class="card.mark"></div>
+                <div class="mark-bottom" :class="card.mark"></div>
+                <div class="number-top"><img :src="card.numsvg" alt=""></div>
+                <div class="number-bottom"><img :src="card.numsvg" alt=""></div>
+              </div>
+            </div>
+          </div>
+          <!-- card array end -->
+
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+<script src="F2E-2.js"></script>
